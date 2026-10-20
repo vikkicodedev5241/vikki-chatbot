@@ -1,1 +1,1 @@
-web: gunicorn AIassistant:app
+web: gunicorn --timeout 120 AIassistant:app
