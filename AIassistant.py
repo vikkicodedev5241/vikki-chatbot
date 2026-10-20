@@ -1,3 +1,4 @@
+import os
 import sqlite3
 import time
 from pathlib import Path
@@ -162,10 +163,13 @@ def chat_api():
     return jsonify({"reply": reply})
 
 
-# ---------- START ----------
+# ---------- INITIALIZE DB & START ----------
+
+# Called at module level so gunicorn also initializes the DB
+init_db()
 
 if __name__ == "__main__":
-    init_db()
+    port = int(os.environ.get("PORT", 5000))
     print("VIKKI AI web app is starting!")
-    print("Open http://127.0.0.1:5000 in your browser.")
-    app.run(host="0.0.0.0", port=5000, debug=False)
+    print(f"Open http://0.0.0.0:{port} in your browser.")
+    app.run(host="0.0.0.0", port=port, debug=False)
