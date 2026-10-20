@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>VIKKI AI</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #0b1020;
+            color: white;
+        }
+
+        .app {
+            max-width: 700px;
+            height: 100dvh;
+            margin: auto;
+            display: flex;
+            flex-direction: column;
+            background: #11182b;
+        }
+
+        header {
+            padding: 18px;
+            background: #18233b;
+            border-bottom: 1px solid #2b3855;
+        }
+
+        .brand {
+            font-size: 25px;
+            font-weight: bold;
+            color: #8bbcff;
+        }
+
+        .subtitle {
+            color: #aab8d0;
+            font-size: 13px;
+            margin-top: 6px;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 1px solid #28344d;
+        }
+
+        .toolbar label {
+            font-size: 14px;
+        }
+
+        .toolbar button {
+            margin-left: auto;
+            background: #273651;
+            color: white;
+            border: 0;
+            padding: 9px 12px;
+            border-radius: 8px;
+        }
+
+        #messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 18px 14px;
+        }
+
+        .welcome {
+            text-align: center;
+            margin: 35px 5px;
+            color: #cbd8ef;
+        }
+
+        .welcome h2 {
+            color: #8bbcff;
+        }
+
+        .message {
+            padding: 12px 14px;
+            border-radius: 14px;
+            margin: 12px 0;
+            max-width: 88%;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+            line-height: 1.5;
+        }
+
+        .user {
+            margin-left: auto;
+            background: #315bb5;
+        }
+
+        .bot {
+            margin-right: auto;
+            background: #202c43;
+            border: 1px solid #30415f;
+        }
+
+        .label {
+            font-size: 11px;
+            color: #a9c8ff;
+            margin-bottom: 5px;
+        }
+
+        .composer {
+            padding: 12px;
+            background: #18233b;
+            border-top: 1px solid #2b3855;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 8px;
+        }
+
+        textarea {
+            flex: 1;
+            min-width: 0;
+            resize: none;
+            height: 48px;
+            max-height: 120px;
+            padding: 14px;
+            border-radius: 12px;
+            border: 1px solid #354767;
+            background: #0c1426;
+            color: white;
+            font-size: 15px;
+            outline: none;
+        }
+
+        #send {
+            border: none;
+            border-radius: 12px;
+            padding: 0 17px;
+            background: #5085f5;
+            color: white;
+            font-weight: bold;
+        }
+
+        #send:disabled {
+            opacity: 0.5;
+        }
+
+        .footer {
+            color: #899bb8;
+            font-size: 11px;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        @media (min-width: 701px) {
+            body {
+                padding: 20px;
+            }
+
+            .app {
+                height: calc(100dvh - 40px);
+                border: 1px solid #2b3855;
+                border-radius: 18px;
+                overflow: hidden;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div class="app">
+
+    <header>
+        <div class="brand">🤖 VIKKI AI</div>
+        <div class="subtitle">
+            Your Personal AI Assistant · Created by Boss
+        </div>
+    </header>
+
+    <div class="toolbar">
+        <input type="checkbox" id="studentMode">
+        <label for="studentMode">🎓 Student Mode</label>
+        <button id="historyButton" type="button">
+            Load History
+        </button>
+    </div>
+
+    <main id="messages" aria-live="polite">
+        <div class="welcome" id="welcome">
+            <h2>Hey Boss! 👋</h2>
+            <p>I'm VIKKI. What shall we learn or build today?</p>
+            <p>Try asking a question below.</p>
+        </div>
+    </main>
+
+    <section class="composer">
+        <div class="input-row">
+            <textarea id="messageInput"
+                placeholder="Message VIKKI..."
+                aria-label="Your message"></textarea>
+
+            <button id="send" type="button">Send</button>
+        </div>
+
+        <div class="footer">
+            Student Mode adds a simple explanation, an example,
+            and a practice question.
+        </div>
+    </section>
+
+</div>
+
+<script>
+    const messages = document.getElementById("messages");
+    const input = document.getElementById("messageInput");
+    const sendButton = document.getElementById("send");
+    const studentMode = document.getElementById("studentMode");
+    const historyButton = document.getElementById("historyButton");
+    const welcome = document.getElementById("welcome");
+
+    function addMessage(sender, text) {
+        if (welcome) {
+            welcome.remove();
+        }
+
+        const bubble = document.createElement("div");
+        bubble.className = "message " + sender;
+
+        const label = document.createElement("div");
+        label.className = "label";
+        label.textContent =
+            sender === "user" ? "You" : "VIKKI";
+
+        const content = document.createElement("div");
+        content.textContent = text;
+
+        bubble.appendChild(label);
+        bubble.appendChild(content);
+        messages.appendChild(bubble);
+
+        messages.scrollTop = messages.scrollHeight;
+    }
+
+    async function sendMessage() {
+        const message = input.value.trim();
+
+        if (!message || sendButton.disabled) {
+            return;
+        }
+
+        addMessage("user", message);
+
+        input.value = "";
+        sendButton.disabled = true;
+        sendButton.textContent = "...";
+
+        const loading = document.createElement("div");
+        loading.className = "message bot";
+        loading.textContent = "VIKKI is thinking...";
+        messages.appendChild(loading);
+        messages.scrollTop = messages.scrollHeight;
+
+        try {
+            const response = await fetch("/api/chat", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    message: message,
+                    student_mode: studentMode.checked
+                })
+            });
+
+            const data = await response.json();
+            loading.remove();
+
+            if (!response.ok) {
+                addMessage(
+                    "bot",
+                    data.reply || "Please try again."
+                );
+            } else {
+                addMessage(
+                    "bot",
+                    data.reply || "I couldn't generate a reply."
+                );
+            }
+
+        } catch (error) {
+            loading.remove();
+            addMessage(
+                "bot",
+                "Couldn't connect to Flask. Check that the server is running."
+            );
+        } finally {
+            sendButton.disabled = false;
+            sendButton.textContent = "Send";
+            input.focus();
+        }
+    }
+
+    async function loadHistory() {
+        historyButton.disabled = true;
+        historyButton.textContent = "Loading...";
+
+        try {
+            const response = await fetch("/api/history");
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error("History unavailable");
+            }
+
+            messages.replaceChildren();
+
+            if (data.history.length === 0) {
+                addMessage("bot", "No saved conversations yet.");
+            } else {
+                data.history.forEach(item => {
+                    addMessage("user", item.user);
+                    addMessage("bot", item.bot);
+                });
+            }
+        } catch (error) {
+            addMessage("bot", "Couldn't load chat history.");
+        } finally {
+            historyButton.disabled = false;
+            historyButton.textContent = "Load History";
+        }
+    }
+
+    sendButton.addEventListener("click", sendMessage);
+
+    input.addEventListener("keydown", function(event) {
+        if (event.key === "Enter" && !event.shiftKey) {
+            event.preventDefault();
+            sendMessage();
+        }
+    });
+
+    historyButton.addEventListener("click", loadHistory);
+</script>
+
+</body>
+</html>
