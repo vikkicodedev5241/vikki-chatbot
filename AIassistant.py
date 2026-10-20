@@ -1,4 +1,4 @@
-import os
+﻿import os
 import sqlite3
 import time
 from pathlib import Path
@@ -11,7 +11,7 @@ app = Flask(__name__)
 
 # Gemini client
 client = genai.Client(api_key=API_KEY)
-chat = client.chats.create(model="gemini-2.0-flash")
+chat = client.chats.create(model="gemini-3.8-flash")
 
 DB_NAME = "vikki.db"
 
