@@ -1,4 +1,4 @@
-﻿import os
+import os
 import sqlite3
 import time
 from pathlib import Path
@@ -11,7 +11,6 @@ app = Flask(__name__)
 
 # Gemini client
 client = genai.Client(api_key=API_KEY)
-chat = client.chats.create(model="gemini-3.8-flash")
 
 DB_NAME = "vikki.db"
 
@@ -60,16 +59,16 @@ def local_reply(message):
         "who created you", "who is your creator",
         "who made you", "who developed you"
     ):
-        return "I'm VIKKI AI! My creator is Boss."
+        return "I'm VIKKI AI! 🤖 My creator is Boss."
 
     if text in ("hi", "hello", "hey", "hey vikki"):
-        return "Hey Boss! I'm VIKKI AI. How can I help?"
+        return "Hey Boss! 👋 I'm VIKKI AI. How can I help?"
 
     if text in ("who are you", "what is your name"):
         return "I'm VIKKI AI, your personal AI assistant!"
 
     if text == "test local":
-        return "Local system working! No Gemini API call used."
+        return "Local system working! No Gemini API call used. ✅"
 
     return None
 
@@ -104,7 +103,10 @@ def ask_vikki(message, student_mode):
     {message}
     """
 
-    response = chat.send_message(prompt)
+    response = client.models.generate_content(
+        model="gemini-3.5-flash-lite",
+        contents=prompt
+    )
     return response.text or "Sorry, I couldn't generate a response."
 
 
@@ -165,7 +167,6 @@ def chat_api():
 
 # ---------- INITIALIZE DB & START ----------
 
-# Called at module level so gunicorn also initializes the DB
 init_db()
 
 if __name__ == "__main__":
